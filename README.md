@@ -1,6 +1,7 @@
 # PowerPico
 PowerPico is a bad USB device made from a Raspberry Pi Pico.
 All the files needed are in my repo.
+This is just for educational purposes.
 
 # HowToMake
 First, take your Raspberry Pi Pico and plug it into your device while holding the BOOTSEL button.
