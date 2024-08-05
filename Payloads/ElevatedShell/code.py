@@ -42,7 +42,7 @@ time.sleep(0.5)
 # Susc
 keyboard.press(Keycode.LEFT_ARROW)
 keyboard.release_all()
-time.sleep(1)
+time.sleep(1.5)
 
 # Press Enter to open Command Prompt
 keyboard.press(Keycode.ENTER)
