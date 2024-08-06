@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ducky Script to Python Converter</title>
+</head>
+<body>
+    <h1>Ducky Script to Python Converter</h1>
+    <textarea id="duckyScriptInput" rows="20" cols="80" placeholder="Paste your Ducky Script here..."></textarea><br>
+    <button onclick="convertDuckyToPython()">Convert to Python</button>
+    <h2>Converted Python Script</h2>
+    <textarea id="pythonScriptOutput" rows="20" cols="80" readonly></textarea><br>
+    <button onclick="downloadPythonScript()">Download Python Script</button>
+    <button onclick="goToGitHub()">Go to GitHub Repository</button>
+
+    <script>
+        const keycodeMap = {
+            "ENTER": "Keycode.ENTER",
+            "GUI": "Keycode.GUI",
+            "SHIFT": "Keycode.SHIFT",
+            "CTRL": "Keycode.CONTROL",
+            "ALT": "Keycode.ALT",
+            "TAB": "Keycode.TAB",
+            "ESC": "Keycode.ESCAPE",
+            "SPACE": "Keycode.SPACEBAR",
+            "DELETE": "Keycode.DELETE",
+            "BACKSPACE": "Keycode.BACKSPACE",
+            "UP": "Keycode.UP_ARROW",
+            "DOWN": "Keycode.DOWN_ARROW",
+            "LEFT": "Keycode.LEFT_ARROW",
+            "RIGHT": "Keycode.RIGHT_ARROW",
+            "CAPSLOCK": "Keycode.CAPS_LOCK",
+            "F1": "Keycode.F1",
+            "F2": "Keycode.F2",
+            "F3": "Keycode.F3",
+            "F4": "Keycode.F4",
+            "F5": "Keycode.F5",
+            "F6": "Keycode.F6",
+            "F7": "Keycode.F7",
+            "F8": "Keycode.F8",
+            "F9": "Keycode.F9",
+            "F10": "Keycode.F10",
+            "F11": "Keycode.F11",
+            "F12": "Keycode.F12",
+            "NUMLOCK": "Keycode.NUM_LOCK",
+            "SCROLLLOCK": "Keycode.SCROLL_LOCK",
+            "SPACEBAR": "Keycode.SPACEBAR",
+            // Add more mappings as needed
+        };
+
+        const customCommandMap = {
+            "DEFINE": "# Custom command DEFINE placeholder",
+            "ATTACK_F": "# Custom command ATTACK_F placeholder",
+            "ATTACK_T": "# Custom command ATTACK_T placeholder",
+            "ATTACK_R": "# Custom command ATTACK_R placeholder",
+            "ATTACK_RC": "# Custom command ATTACK_RC placeholder",
+            "SET-MPPREFERENCE": "# Custom command SET-MPPREFERENCE placeholder",
+            "NEW-ITEMPROPERTY": "# Custom command NEW-ITEMPROPERTY placeholder",
+            "REMOVE-ITEM": "# Custom command REMOVE-ITEM placeholder",
+            "GET-PSREADLINEOPTION": "# Custom command GET-PSREADLINEOPTION placeholder",
+            "WINDOWS-SICHERHEIT": "# Custom command WINDOWS-SICHERHEIT placeholder",
+            "VAR": "# Custom command VAR placeholder",
+            "CLEAN": "# Custom command CLEAN placeholder",
+            "ATTACKMODE": "# Custom command ATTACKMODE placeholder",
+            "STRINGLN": "# Custom command STRINGLN placeholder",
+            "IF": "# Custom command IF placeholder",
+            "ELSE": "# Custom command ELSE placeholder",
+            "END_IF": "# Custom command END_IF placeholder",
+            "END_FUNCTION": "# Custom command END_FUNCTION placeholder",
+            "FUNCTION": "# Custom command FUNCTION placeholder",
+            "ENDFUNCTION": "# Custom command ENDFUNCTION placeholder",
+            "CALL": "# Custom command CALL placeholder",
+        };
+
+        function parseKeycode(key) {
+            return keycodeMap[key.toUpperCase()] || `Keycode.${key.toUpperCase()}`;
+        }
+
+        function parseKeys(parts) {
+            return parts.map(part => parseKeycode(part)).join(', ');
+        }
+
+        function convertDuckyToPython() {
+            const duckyScript = document.getElementById("duckyScriptInput").value;
+            const pythonScript = [
+                "import time",
+                "import usb_hid",
+                "from adafruit_hid.keyboard import Keyboard",
+                "from adafruit_hid.keycode import Keycode",
+                "from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS",
+                "",
+                "# Initialize the keyboard",
+                "keyboard = Keyboard(usb_hid.devices)",
+                "keyboard_layout = KeyboardLayoutUS(keyboard)",
+                ""
+            ];
+
+            const lines = duckyScript.split('\n');
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                const parts = line.split(' ');
+                const command = parts[0].toUpperCase();
+
+                if (command === "DELAY") {
+                    const delayTime = parseInt(parts[1]) / 1000.0;
+                    pythonScript.push(`time.sleep(${delayTime})`);
+                } else if (command === "STRING") {
+                    const stringContent = parts.slice(1).join(' ');
+                    pythonScript.push(`keyboard_layout.write("${stringContent}")`);
+                } else if (command === "REM") {
+                    const commentContent = parts.slice(1).join(' ');
+                    pythonScript.push(`# ${commentContent}`);
+                } else if (keycodeMap[command]) {
+                    const keysStr = parseKeys(parts);
+                    pythonScript.push(`keyboard.send(${keysStr})`);
+                } else if (customCommandMap[command]) {
+                    pythonScript.push(customCommandMap[command]);
+                } else if (command === "IF") {
+                    const condition = parts.slice(1).join(' ');
+                    pythonScript.push(`if ${condition}:`);
+                } else if (command === "ELSE") {
+                    pythonScript.push("else:");
+                } else if (command === "ENDIF") {
+                    pythonScript.push("# End of IF block");
+                } else if (command === "FUNCTION") {
+                    const functionName = parts.slice(1).join(' ');
+                    pythonScript.push(`def ${functionName}:`);
+                } else if (command === "ENDFUNCTION") {
+                    pythonScript.push("# End of function");
+                } else if (command === "CALL") {
+                    const functionName = parts.slice(1).join(' ');
+                    pythonScript.push(`${functionName}()`);
+                } else {
+                    const keysStr = parseKeys(parts);
+                    pythonScript.push(`keyboard.send(${keysStr})`);
+                }
+            });
+
+            document.getElementById("pythonScriptOutput").value = pythonScript.join('\n');
+        }
+
+        function downloadPythonScript() {
+            const pythonScript = document.getElementById("pythonScriptOutput").value;
+            const blob = new Blob([pythonScript], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "code.py";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function goToGitHub() {
+            window.location.href = "https://github.com/WIN-Make/PowerPico";
+        }
+    </script>
+</body>
+</html>
