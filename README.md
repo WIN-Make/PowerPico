@@ -35,6 +35,8 @@ Convert a Ducky Script:
 Open the PayloadConverter (BETA) folder from the files provided.
 Paste your Ducky script into payload.txt and save the file.
 Run the DD to PY.py script to convert the Ducky script into a code.py file.
+Or open PayloadConverterOnline.html and paste your code and click convert to python then download your code.py.
+
 Deploy the Converted Payload:
 
 A code.py file will be created. Copy this file to the root directory of your CIRCUITPY drive on the Pico, replacing any existing code.py.
